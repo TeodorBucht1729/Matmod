@@ -44,13 +44,20 @@ def stupidsim():
         
     return tot_arg/peoples
 
+def dir_to_ind(curr_dir):
+    if(curr_dir == 1):
+        return 0
+    else:
+        return 1
+    
+
 def smartsim():
     
     floors = 10
-    door_time = 15
+    door_time = 15 + 8
     peoples = 100000
     people_per_minute = 0.5
-    each_floor_time
+    each_floor_time = 2
     (weights1, weights2) = genweights(floors)
 
     queries = grh.get_rand_people(floors, peoples, 60/people_per_minute,  weights1, weights2)
@@ -64,7 +71,7 @@ def smartsim():
     people_down = []
     waiting_up = [[] for i in range(floors)]
     waiting_down = [[] for i in range(floors)]
-    goal_dest = floors + 100
+    goal_dest = 0
     curr_in_elev = []
     elev_size = 10
     for que in queries:
@@ -73,34 +80,55 @@ def smartsim():
         else:
             waiting_down[que[0]].append(que)
 
+    waiting = [waiting_up, waiting_down]
+    #denna loopen går igenom alla våningar som hissen är på
     for counter in range(1000000):
-        if(curr_dir == 1):
-           
+        if(curr_floor == goal_dest or curr_floor*(floors - 1 - curr_floor) == 0):
+            curr_dir *= -1
+
             #lägg till att man först tar ut alla som ska av här.
             #kanske lättare att först fundera ut på hur folk som är i hissen ska komma in, och hur det ska registreras. 
+        #kolla om det finns nån som ska av på den här våningen och släpper av dem
+        leave_people = False
+        for pep in curr_in_elev:
+            if(pep[0][1] == curr_floor):
+                leave_people = True
+                t_fak = curr_time - pep[1]
+                t_fak += door_time/2
+                t_opt = door_time*(3/2) + 2*abs(curr_floor - pep[0][0])
+                tot_arg += grh.arg(t_fak, t_opt)
+                curr_in_elev.remove(pep)     
 
-            people_wait = 0
-            while(len(curr_in_elev) < elev_size and waiting_up[curr_floor][0][2] < curr_time):
-                people_wait += 1
-            for i in range(people_wait):
-                if(len(curr_in_elev) < elev_size):
-                    #lägg till informationen om personen som går på och vid vilken tidpunkt detta sker. Ta också bort personen ur väntelistan
-                    curr_in_elev.append((waiting_up[curr_floor][0], curr_time))
-                    temp_goal = curr_in_elev[len(curr_in_elev) - 1][0][1]
-                    if(temp_goal > goal_dest):
-                        goal_dest = temp_goal
-                    waiting_up[curr_floor].pop(0)
-            if(people_wait > 0):
-                curr_time += door_time
-            curr_time += each_floor_time
-                     
 
+        people_wait = 0
+        #kolla hur många vi kan plocka upp från den nuvarande våningen
+        print(curr_floor)
+        while(people_wait < len(waiting[dir_to_ind(curr_dir)][curr_floor]) and len(curr_in_elev) < elev_size and waiting[dir_to_ind(curr_dir)][curr_floor][people_wait][2] < curr_time):
+            people_wait += 1
+        for i in range(people_wait):
+            if(len(curr_in_elev) < elev_size):
+                #lägg till informationen om personen som går på och vid vilken tidpunkt detta sker. Ta också bort personen ur väntelistan
+                curr_in_elev.append((waiting[dir_to_ind(curr_dir)][curr_floor][0], curr_time + door_time/2))
+                temp_goal = curr_in_elev[len(curr_in_elev) - 1][0][1]
+                if(curr_dir * temp_goal > curr_dir * goal_dest):
+                    goal_dest = temp_goal
+                waiting[dir_to_ind(curr_floor)][curr_floor].pop(0)
+            else:
+                break
+        if(people_wait > 0 or leave_people):
+            curr_time += door_time
+        curr_time += each_floor_time
+
+        curr_floor += curr_dir
+        curr_floor = max(curr_floor, 0)
+
+    return tot_arg/peoples
 
              
 
     
 
-print(stupidsim())
+print(smartsim())
 
 
 
