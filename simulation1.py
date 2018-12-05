@@ -45,7 +45,60 @@ def stupidsim():
     return tot_arg/peoples
 
 def smartsim():
-    return "hej"
+    
+    floors = 10
+    door_time = 15
+    peoples = 100000
+    people_per_minute = 0.5
+    each_floor_time
+    (weights1, weights2) = genweights(floors)
+
+    queries = grh.get_rand_people(floors, peoples, 60/people_per_minute,  weights1, weights2)
+#    print(queries)
+    curr_floor = 0
+    curr_time = 0
+    tot_arg = 0
+    #curr_dir är 1 om hissen är på väg upp, och -1 om det är på väg ner.
+    curr_dir = 1
+    people_up = []
+    people_down = []
+    waiting_up = [[] for i in range(floors)]
+    waiting_down = [[] for i in range(floors)]
+    goal_dest = floors + 100
+    curr_in_elev = []
+    elev_size = 10
+    for que in queries:
+        if(que[1] > que[0]):
+            waiting_up[que[0]].append(que)
+        else:
+            waiting_down[que[0]].append(que)
+
+    for counter in range(1000000):
+        if(curr_dir == 1):
+           
+            #lägg till att man först tar ut alla som ska av här.
+            #kanske lättare att först fundera ut på hur folk som är i hissen ska komma in, och hur det ska registreras. 
+
+            people_wait = 0
+            while(len(curr_in_elev) < elev_size and waiting_up[curr_floor][0][2] < curr_time):
+                people_wait += 1
+            for i in range(people_wait):
+                if(len(curr_in_elev) < elev_size):
+                    #lägg till informationen om personen som går på och vid vilken tidpunkt detta sker. Ta också bort personen ur väntelistan
+                    curr_in_elev.append((waiting_up[curr_floor][0], curr_time))
+                    temp_goal = curr_in_elev[len(curr_in_elev) - 1][0][1]
+                    if(temp_goal > goal_dest):
+                        goal_dest = temp_goal
+                    waiting_up[curr_floor].pop(0)
+            if(people_wait > 0):
+                curr_time += door_time
+            curr_time += each_floor_time
+                     
+
+
+             
+
+    
 
 print(stupidsim())
 
