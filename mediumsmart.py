@@ -1,5 +1,11 @@
 import genrandhiss as grh
 
+def dir_to_ind(curr_dir):
+    if(curr_dir == 1):
+        return 0
+    else:
+        return 1
+
 def genweights(floors):
     weights1 = [1 for i in range(floors)]
     weights2 = []
@@ -9,49 +15,8 @@ def genweights(floors):
         weights2.append(temp)
     return (weights1, weights2)
 
-def stupidsim():
-    #generera vikter, kommer ändras senare
-    floors = 10
-    door_time = 15
-    peoples = 100000
-    people_per_minute = 0.5
-    (weights1, weights2) = genweights(floors)
 
-    queries = grh.get_rand_people(floors, peoples, 60/people_per_minute,  weights1, weights2)
-#    print(queries)
-    curr_floor = 0
-    curr_time = 0
-    tot_arg = 0
-    while(len(queries) > 0): 
-        if(queries[0][2] > curr_time):
-            curr_time = queries[0][2]
-
-        curr_time += grh.time_of_difference(curr_floor, queries[0][0])
-        #travel_start är tidpunkten resan börjar
-        travel_start = curr_time
-        curr_time += door_time
-        curr_floor = queries[0][0]
-        curr_time += grh.time_of_difference(curr_floor, queries[0][1])
-        curr_time += door_time
-        curr_floor = queries[0][1]
-        pass_finished = curr_time - door_time/2
-        t_fak = pass_finished - queries[0][2]
-        t_opt = pass_finished - travel_start
-#        print(t_fak, t_opt)
-        tot_arg += grh.arg(t_fak, t_opt)
-#        print(grh.arg(t_fak, t_opt))
-        queries.pop(0)
-        
-    return tot_arg/peoples
-
-def dir_to_ind(curr_dir):
-    if(curr_dir == 1):
-        return 0
-    else:
-        return 1
-    
-
-def smartsim():
+def mediumsim():
     
     floors = 10
     door_time = 15 + 8
@@ -152,22 +117,9 @@ def smartsim():
         if(people_wait > 0 or leave_people):
             curr_time += door_time
         curr_time += each_floor_time
-
-        #turn the elevator
-        print(curr_floor, goal_dest)
-#        if(curr_floor == goal_dest):
-#            print(curr_in_elev)
-        if(curr_floor == goal_dest and len(curr_in_elev) == 0):
-
-            print("HEJ")
-            goal_dest = 0
-       
-        if(goal_dest > curr_floor):
-            curr_dir = 1
-        elif(goal_dest < curr_floor):
-            curr_dir = -1
-     #   curr_dir = int((goal_dest - curr_floor)/floors)
-        print(curr_dir)
+    
+        if(curr_floor == 0 or curr_floor == floors - 1):
+            curr_dir *= -1
 
         curr_floor += curr_dir
         curr_floor = max(curr_floor, 0)
@@ -179,7 +131,7 @@ def smartsim():
 
     
 
-print(smartsim())
+print(mediumsim())
 
 
 
