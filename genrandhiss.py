@@ -2,7 +2,7 @@ import random
 import math
 
 def arg(t_fak, t_opt):
-    return min(1.037**min(150, t_fak - t_opt), 100)
+    return ( 10* math.atan(0.1*(t_fak - t_opt)-3)+12.5)
 
 def time_of_difference(a, b):
     d = abs(a-b)

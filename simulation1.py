@@ -2,6 +2,7 @@ import genrandhiss as grh
 
 def genweights(floors):
     weights1 = [1 for i in range(floors)]
+
     weights2 = []
     for i in range(floors):
         temp = [1 for i in range(floors)]
@@ -13,8 +14,8 @@ def stupidsim():
     #generera vikter, kommer ändras senare
     floors = 10
     door_time = 15
-    peoples = 100000
-    people_per_minute = 0.5
+    peoples = 1000
+    people_per_minute = 2
     (weights1, weights2) = genweights(floors)
 
     queries = grh.get_rand_people(floors, peoples, 60/people_per_minute,  weights1, weights2)
@@ -177,9 +178,8 @@ def smartsim():
 
              
 
-    
-
-print(smartsim())
+ans = (stupidsim(), smartsim()) 
+print(ans)
 
 
 
